@@ -92,4 +92,55 @@ class Job extends React.Component {
 
           console.log('Job: ' + jobAddress + ' for price: ' + AGI.toDecimal(jobPrice) + ' AGI was created');
 
-          this.setState((prevState) => 
+          this.setState((prevState) => ({
+            jobAddress: jobAddress,
+            jobPrice: jobPrice,
+            jobInstance: window.ethjs.contract(jobAbi).at(jobAddress),
+          }));
+
+          this.nextJobStep();
+        }
+      });
+    }).catch(this.handleReject);
+  }
+
+  approveTokens() {
+
+    this.props.token.approve(this.state.jobAddress, this.state.jobPrice, {from: this.props.account}).then(response => {
+
+      this.setState({
+        waitingForMetaMask: false,
+      });
+
+      this.waitForTransaction(response).then(receipt => {
+        console.log('ECR20 approve called with ' + AGI.toDecimal(this.state.jobPrice) + ' AGI for Job: ' + this.state.jobAddress);
+        this.nextJobStep();
+      });
+    }).catch(this.handleReject);
+  }
+
+  fundJob() {
+
+    this.state.jobInstance.fundJob({ from: this.props.account }).then(response => {
+
+      this.setState({
+        waitingForMetaMask: false,
+      });
+
+      this.waitForTransaction(response).then(receipt => {
+
+        console.log('FundJob called on Job: ' + this.state.jobAddress);
+        this.nextJobStep();
+      });
+    
+    }).catch(this.handleReject);
+  }
+
+  callApi(serviceName, methodName, params) {
+
+    let addressBytes = [];
+    for(let i=2; i< this.state.jobAddress.length-1; i+=2) {
+      addressBytes.push(parseInt(this.state.jobAddress.substr(i, 2), 16));
+    }
+
+    window.ethjs.getCode(this.props.ag
