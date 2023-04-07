@@ -12,3 +12,8 @@ app.get('/bundle*', (req, res, next) => {
   res.set('Content-Encoding', 'gzip');
   res.set('Content-Type', 'text/javascript');
   next();
+})
+
+app.use(express.static(paths.outPath));
+
+app.listen(PORT, () => { console.log('Alpha dapp running at http://localhost:' + PORT) });
