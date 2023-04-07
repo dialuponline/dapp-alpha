@@ -40,4 +40,56 @@ class Job extends React.Component {
     this.showModal     = this.showModal.bind(this);
 
     abiDecoder.addABI(agentAbi);
-    abiDecoder.addABI(jo
+    abiDecoder.addABI(jobAbi);
+  }
+
+  componentDidMount() {
+    this.jobDomNode.scrollIntoView();
+  }
+
+  nextJobStep() {
+    this.clearModal();
+    this.setState((prevState) => ({
+      jobStep: prevState.jobStep + 1
+    }));
+  }
+
+  showModal(modalFunctional) {
+    this.setState({
+      waitingForMetaMask: true,
+      showModal: true,
+      modalFunctional: modalFunctional,
+    });
+  }
+
+  clearModal() {
+    this.setState({
+       showModal: false,
+    });
+  }
+
+  handleReject(error) {
+    console.log(ERROR_UTILS.sanitizeError(error));
+    this.clearModal();
+  }
+
+  createJob() {
+    this.props.agent['contractInstance'].createJob({from: this.props.account}).then(response => {
+
+      this.setState({
+        waitingForMetaMask: false,
+      });
+
+      this.waitForTransaction(response).then(receipt => {
+
+        let decodedLogs = abiDecoder.decodeLogs(receipt.logs);
+        let createdEvent = decodedLogs.find(log => log.name == "JobCreated" && log.address == this.props.agent['contractInstance'].address);
+
+        if(createdEvent) {
+
+          let jobAddress = createdEvent.events.find(item => item.name == 'job').value;
+          let jobPrice   = createdEvent.events.find(item => item.name == 'jobPrice').value;
+
+          console.log('Job: ' + jobAddress + ' for price: ' + AGI.toDecimal(jobPrice) + ' AGI was created');
+
+          this.setState((prevState) => 
