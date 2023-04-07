@@ -35,4 +35,34 @@ class Account extends React.Component {
                 <Tag>
                   <a target="_blank" href={this.props.network && this.props.account && typeof NETWORKS[this.props.network] !== "undefined" ? `${NETWORKS[this.props.network].etherscan}/address/${this.props.account}` : undefined}>
                     {this.props.account}
-   
+                  </a>
+                </Tag>
+                <Divider type="vertical"/>
+                <CopyToClipboard text={this.props.account} onCopy={() => message.success('Account address copied', 1)}>
+                  <a>
+                    <Icon type="copy"/>
+                  </a>
+                </CopyToClipboard>
+              </div>
+              <div>
+                Balance
+                <Divider type="vertical"/>
+                <Tag>
+                  {AGI.toDecimal(this.props.agiBalance)} AGI
+                </Tag>
+                <Divider type="vertical"/>
+                <CopyToClipboard text={AGI.toDecimal(this.props.agiBalance)} onCopy={() => message.success('Account balance copied', 1)}>
+                  <a>
+                    <Icon type="copy"/>
+                  </a>
+                </CopyToClipboard>
+              </div>
+            </Col>
+          </Row>
+        }
+      </Card>
+    )
+  }
+}
+
+export default Account;
