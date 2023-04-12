@@ -143,4 +143,33 @@ class Job extends React.Component {
       addressBytes.push(parseInt(this.state.jobAddress.substr(i, 2), 16));
     }
 
-    window.ethjs.getCode(this.props.ag
+    window.ethjs.getCode(this.props.agent.contractInstance.address).then((bytecode) => {
+      let bcBytes = [];
+      for (let i = 2; i < bytecode.length; i += 2) {
+        bcBytes.push(parseInt(bytecode.substr(i, 2), 16));
+      }
+
+      let bcSum = md5(bcBytes);
+      let sigPayload = bcSum === oldSigAgentBytecodeChecksum ? Eth.keccak256(addressBytes) : Eth.fromUtf8(this.state.jobAddress);
+
+      window.ethjs.personal_sign(sigPayload, this.props.account).then(signature => {
+
+        this.setState({
+          waitingForMetaMask: false,
+        });
+
+        let r = `0x${signature.slice(2, 66)}`;
+        let s = `0x${signature.slice(66, 130)}`;
+        let v = parseInt(signature.slice(130, 132), 16);
+
+        this.props.agent.contractInstance.validateJobInvocation(this.state.jobAddress, v, r, s, {from: this.props.account}).then(validateJob => {
+          console.log('job invocation validation returned: ' + validateJob[0]);
+
+          const requestHeaders = { "snet-job-address": this.state.jobAddress, "snet-job-signature": signature }
+          const requestObject = params
+
+          const serviceSpecJSON = Root.fromJSON(this.props.serviceSpec[0])
+          const packageName = Object.keys(serviceSpecJSON.nested)
+            .find(key =>
+              typeof serviceSpecJSON.nested[key] === "object" &&
+              hasOwnDefinedProperty(serviceSpecJSO
