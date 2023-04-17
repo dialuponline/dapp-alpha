@@ -172,4 +172,40 @@ class Job extends React.Component {
           const packageName = Object.keys(serviceSpecJSON.nested)
             .find(key =>
               typeof serviceSpecJSON.nested[key] === "object" &&
-              hasOwnDefinedProperty(serviceSpecJSO
+              hasOwnDefinedProperty(serviceSpecJSON.nested[key], "nested")
+            )
+ 
+          if (this.props.serviceEncoding === "json") {
+            grpcJSONRequest(this.props.agent.endpoint, packageName, serviceName, methodName, requestHeaders, requestObject)
+              .then(response => {
+                this.setState(() => ({ "jobResult": response }))
+                this.nextJobStep()
+              })
+              .catch(console.error)
+          } else if (this.props.serviceEncoding === "proto") {
+            const Service = serviceSpecJSON.lookup(serviceName)
+            const serviceObject = Service.create(rpcImpl(this.props.agent.endpoint, packageName, serviceName, methodName, requestHeaders), false, false)
+
+            grpcRequest(serviceObject, methodName, requestObject)
+              .then(response => {
+                this.setState(() => ({ "jobResult": response }))
+                this.nextJobStep()
+              })
+              .catch(console.error)
+          } else {
+            throw new Error(`Encoding "${this.props.serviceEncoding}" is not recognized`)
+          }
+        });
+      }).catch(this.handleReject);
+    }).catch((error) => {
+      console.log("getCode error", error);
+    });
+  }
+
+  async waitForTransaction(hash) {
+    let receipt;
+    while(!receipt) {
+      receipt = await window.ethjs.getTransactionReceipt(hash);
+    }
+
+    if (rec
