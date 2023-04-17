@@ -208,4 +208,36 @@ class Job extends React.Component {
       receipt = await window.ethjs.getTransactionReceipt(hash);
     }
 
-    if (rec
+    if (receipt.status === "0x0") {
+      throw receipt
+    }
+
+    return receipt;
+  }
+  
+  render() {
+    let modal = type => 
+      <Modal title={null} footer={null} closable={false} visible={this.state.showModal}>
+        <Steps size="small" current={this.state.waitingForMetaMask ? 0 : 1}>
+          <Steps.Step title='MetaMask' icon={this.state.waitingForMetaMask ? <Icon type="loading" /> : null} />
+          <Steps.Step title={type[0].toUpperCase().concat(type.slice(1))} icon={!this.state.waitingForMetaMask ? <Icon type="loading" /> : null} />
+        </Steps>
+        <br/>
+        {
+          this.state.waitingForMetaMask ?
+            <Alert description="Waiting for interaction with MetaMask to complete." />
+            : <Alert description={'Waiting for ' + (type === 'blockchain' ? 'transaction to be mined on the blockchain.' : 'API response')} />
+        }
+      </Modal>
+    
+    let blockchainModal = () => modal('blockchain');
+    let serviceModal = () => modal('service');
+
+    let steps = [
+      {
+        title: 'Create Job',
+        render: () => {
+          return(
+            <p>
+              The first step in calling the Agent's API is to create a Job contract with the Agent. The Job contract stores the negotiated price in AGI tokens for
+              calling the API. The neg
