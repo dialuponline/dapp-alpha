@@ -240,4 +240,30 @@ class Job extends React.Component {
           return(
             <p>
               The first step in calling the Agent's API is to create a Job contract with the Agent. The Job contract stores the negotiated price in AGI tokens for
-              calling the API. The neg
+              calling the API. The negotiated price is based upon the 'current price' value stored in the Agent contract at the time the Job is created. Once a Job contract
+              is created, tokens can be transferred to the Job to be held in escrow until the Agent has performed the work.
+              <br/>
+              <br/>
+              <Button type="primary" onClick={() => {this.showModal(blockchainModal); this.createJob()}}>Create Job Contract</Button>
+            </p>)
+        }
+      },
+      {
+        title: 'Approve Transfer',
+        render: () => {
+          return(
+            <p>
+              The second step in calling the Agent's API is to approve the Job contract to transfer AGI tokens on your behalf. The amount of AGI tokens that will be authorized
+              is limited to the agreed upon price of services in the Job contract that was just created.
+              <br/>
+              <br/>
+              <Button type="primary" onClick={() => {this.showModal(blockchainModal); this.approveTokens()}}>Approve AGI Transfer</Button>
+            </p>)
+          }
+      },
+      {
+        title: 'Fund Job',
+        render: () => {
+          return(
+            <p>
+                Now that the token transfer has been approved, the third step is to fund the actual Job contract. This will cause the Job contract to transfer the AGI
