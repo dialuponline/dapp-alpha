@@ -304,4 +304,39 @@ class Job extends React.Component {
     const CallComponent = this.props.callComponent;
     return(
 
-      
+      <React.Fragment>
+        {
+          this.state.showModal && this.state.modalFunctional()
+        }
+
+        <Card title={
+          <React.Fragment>
+            <Icon type="appstore-o" />
+            <Divider type="vertical"/>
+            Job
+            <br/>
+          </React.Fragment> }>
+
+          <Divider orientation="left">Job Details</Divider>
+
+          <table ref={jobDomNode => this.jobDomNode = jobDomNode}>
+            <tbody>
+              <tr>
+                <td width="120px"><b>Agent:</b></td>
+                <td>{this.props.agent.name}</td>
+              </tr>
+              <tr>
+                <td><b>Current Price:</b></td>
+                <td>{`${AGI.toDecimal(this.props.agent.currentPrice)} AGI`}</td>
+              </tr>
+              <tr>
+                <td><b>Job Address:</b></td>
+                <td>
+                  {this.state.jobAddress ?
+                    <Tag>
+                      <a target="_blank" href={this.props.network && typeof NETWORKS[this.props.network] !== "undefined" ? `${NETWORKS[this.props.network].etherscan}/address/${this.state.jobAddress}` : undefined}>
+                        {this.state.jobAddress}
+                      </a>
+                    </Tag>
+                    : '(not created)'}
+                  </
