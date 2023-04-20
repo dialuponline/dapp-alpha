@@ -381,4 +381,4 @@ class Job extends React.Component {
   }
 }
 
-ex
+export default Job;
