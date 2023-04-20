@@ -339,4 +339,46 @@ class Job extends React.Component {
                       </a>
                     </Tag>
                     : '(not created)'}
-                  </
+                  </td>
+              </tr>
+              <tr>
+                <td><b>Job Price:</b></td>
+                <td>{this.state.jobPrice ? `${AGI.toDecimal(this.state.jobPrice)} AGI` : '(not created)'}</td>
+              </tr>
+              
+            </tbody>
+          </table>
+          <br/>
+
+          {
+            (this.state.jobStep < steps.length) &&
+              <React.Fragment>
+                <Divider orientation="left">Job Progress</Divider>
+
+                <Steps size="small" progressDot current={this.state.jobStep} >
+                  {steps.map((step, i) => {return <Steps.Step title={step.title} key={`${i}-${step.title}`} /> })}
+                </Steps>
+
+                <div style={{ marginTop: '20px' }}>
+                  {steps[this.state.jobStep].render()}
+                </div>
+              </React.Fragment>
+          }
+          {
+            // Display service specific form submission or results display for the last two steps
+            (this.state.jobStep >= (steps.length - 2)) &&
+            <React.Fragment>
+            <div>
+            <Divider orientation="left">Service Call</Divider>
+            <CallComponent callModal={serviceModal}  showModalCallback={this.showModal} callApiCallback={this.callApi} jobResult={this.state.jobResult}/>
+            </div>
+            </React.Fragment>
+          }
+
+        </Card>
+      </React.Fragment>
+    );
+  }
+}
+
+ex
