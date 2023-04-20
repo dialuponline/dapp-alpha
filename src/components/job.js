@@ -266,4 +266,42 @@ class Job extends React.Component {
         render: () => {
           return(
             <p>
-                Now that the token transfer has been approved, the third step is to fund the actual Job contract. This will cause the Job contract to transfer the AGI
+                Now that the token transfer has been approved, the third step is to fund the actual Job contract. This will cause the Job contract to transfer the AGI tokens that
+                were just approved from your balance to the Job contracts address to be held in escrow until the Job is completed by the Agent performing the work.
+                <br/>
+                <br/>
+                <Button type="primary" onClick={() => {this.showModal(blockchainModal); this.fundJob()}}>Fund Job Contract</Button>
+            </p>)
+        },
+      },
+      {
+        
+        title: 'Call API',
+        render: () => {
+          return(
+            <p>
+            Now that the Job contract has been funded you are able to call the API on the Agent. Agents
+            take different inputs, so may have their own UI. Once you've provided inputs, click the
+            "Call Agent API" button to initate the API call. This will prompt one further interaction with
+            MetaMask to sign your API request before submitting the request to the Agent. This interaction
+            does not initiate a transaction or transfer any additional funds.
+            </p>
+            )
+        }
+      },
+      {
+        
+        title: 'Done',
+        render: () => {
+          return(
+            <p>
+            Your request has been completed.
+            </p>
+            )
+        }
+      }
+    ];
+    const CallComponent = this.props.callComponent;
+    return(
+
+      
