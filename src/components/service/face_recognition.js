@@ -2,9 +2,8 @@
 import React from 'react';
 import {Layout, Divider, Card, Icon, Spin, Alert, Row, Col, Button, Tag, message, Table, Collapse, Steps, Modal, Upload} from 'antd';
 import { debounce } from 'underscore';
-import styles from './face_landmarks.css.js';
 
-class FaceLandmarksService extends React.Component {
+class FaceRecognitionService extends React.Component {
 
   constructor(props) {
     super(props);
@@ -17,9 +16,8 @@ class FaceLandmarksService extends React.Component {
         fileUploaded: false,
         file: undefined,
         fileReader: undefined,
-        methodName: "get_landmarks",  
+        methodName: "recognise_face",
         facesString: '[{"x":10,"y":10,"w":100,"h":100}]',
-        landmarkModel: "68",
         inputValid: true,
     };
   }
@@ -49,9 +47,6 @@ class FaceLandmarksService extends React.Component {
     }
     
     if (this.state.methodName.length == 0)
-        inputValid = false;
-        
-    if (this.state.landmarkModel !== "68" && this.state.landmarkModel !== "5")
         inputValid = false;
 
     if (!this.state.fileUploaded)
@@ -88,54 +83,8 @@ class FaceLandmarksService extends React.Component {
     this.props.showModalCallback(this.props.callModal);
     this.props.callApiCallback(this.state.methodName, {
         image: this.state.fileReader.result.split(',')[1],
-        face_bboxes: JSON.parse(this.state.facesString),
-        landmark_model: this.state.landmarkModel,
+        faces: JSON.parse(this.state.facesString)
     });
-  }
-
-  drawX(ctx, x, y) {
-    let size = 3;
-    
-    ctx.moveTo(x - size, y - size);
-    ctx.lineTo(x + size, y + size);
-    ctx.stroke();
-
-    ctx.moveTo(x + size, y - size);
-    ctx.lineTo(x - size, y + size);
-  }
-
-  renderLandmarks(result) {
-    let img = this.refs.sourceImg;
-    let cnvs = this.refs.bboxCanvas;
-    let outsideWrap = this.refs.outsideWrap;
-    if (img === undefined || cnvs === undefined || outsideWrap == undefined)
-      return;
-    
-    outsideWrap.style.width = img.naturalWidth + "px";
-    outsideWrap.style.height = img.naturalHeight + "px";
-    cnvs.style.position = "absolute";
-    cnvs.style.left = img.offsetLeft + "px";
-    cnvs.style.top = img.offsetTop + "px";
-    cnvs.width = img.naturalWidth;
-    cnvs.height = img.naturalHeight;
-  
-    let ctx = cnvs.getContext("2d");
-    result["landmarks"].forEach((item) => {
-      ctx.beginPath();
-      item["points"].forEach((p) => {
-        this.drawX(ctx, p['x'], p['y']);
-      })
-      ctx.lineWidth = 1;
-      ctx.strokeStyle = '#00ff00';
-      ctx.stroke();
-    });
-    
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.jobResult !== prevProps.jobResult) {
-      this.renderLandmarks(this.props.jobResult);
-    }
   }
 
   renderForm() {
@@ -156,11 +105,6 @@ class FaceLandmarksService extends React.Component {
             </React.Fragment>
         }
         <div>
-        <label>
-          Landmark model:
-          <input type="text" value={this.state.landmarkModel} onChange={ this.handleChange.bind(this, 'landmarkModel') } />
-        </label>
-        <br/>
         <label>
           Faces JSON (you can get this from face detect):
           <textarea onChange={ this.handleChange.bind(this, 'facesString')} value={this.state.facesString} />
@@ -192,15 +136,7 @@ class FaceLandmarksService extends React.Component {
     let jsonResult = JSON.stringify(this.props.jobResult);
     return(
       <div>
-        <div>
-          <textarea rows="4" cols="50" readOnly value={jsonResult}/>
-        </div>
-        <div ref="outsideWrap" style={styles.outsideWrapper}>
-          <div style={styles.insideWrapper}>
-            <img ref="sourceImg" style={styles.coveredImage} src={this.state.fileReader.result}/>
-            <canvas ref="bboxCanvas" style={styles.coveringCanvas}/>
-          </div>
-        </div>
+        <textarea rows="4" cols="50" readOnly value={jsonResult}/>
       </div>
     );
   }
@@ -210,7 +146,7 @@ class FaceLandmarksService extends React.Component {
       <div>
           <p>
           A service that takes an image and a bounding box for where a face exists and returns
-          a list of 2d image coordinates, one for each facial landmark the service knows about.
+          a 128d vector representing the identity of the face.
           
           This is part of the <a href="https://github.com/singnet/face-services">face-services</a> suite of example
           SingularityNET services.
@@ -237,4 +173,4 @@ class FaceLandmarksService extends React.Component {
   }
 }
 
-export default FaceLandmarksService;
+export default FaceRecognitionService;
