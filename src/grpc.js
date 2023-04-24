@@ -61,4 +61,12 @@ function frameRequest(bytes) {
 function parseChunk(buffer) {
   return new ChunkParser()
     .parse(new Uint8Array(buffer))
-    .fin
+    .find(chunk => chunk.chunkType === ChunkType.MESSAGE)
+}
+
+export function grpcRequest(serviceObject, methodName, requestObject) {
+  methodName = methodName.charAt(0).toLowerCase() + methodName.substr(1)
+  if (!serviceObject[methodName]) throw new Error(`Service does not have method ${methodName}. ${serviceObject}`)
+
+  return serviceObject[methodName](requestObject)
+}
