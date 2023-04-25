@@ -44,4 +44,50 @@ class App extends React.Component {
       'Alpha TensorFlow Agent': AlphaExampleService,
       'face_detect': FaceDetectService,
       'face_landmarks': FaceLandmarksService,
-      '
+      'face_alignment': FaceAlignmentService,
+      'face_recognition': FaceRecognitionService,
+      'Exchange AGI for BTC': ExchangeService
+    };
+    this.serviceDefaultComponent = DefaultService;
+    
+
+    this.web3               = undefined;
+    this.eth                = undefined;
+    this.watchWalletTimer   = undefined;
+    this.watchNetworkTimer  = undefined;
+    this.agentContract      = undefined;
+    this.registryInstances  = undefined;
+    this.tokenInstance      = undefined;
+  }
+
+  componentWillMount() {
+    window.addEventListener('load', () => this.handleWindowLoad());
+  }
+
+  componentWillUnmount() {
+    if(this.watchWalletTimer) {
+      clearInterval(this.watchWalletTimer);
+    }
+    if(this.watchNetworkTimer) {
+      clearInterval(this.watchNetworkTimer);
+    }
+  }
+
+  async handleWindowLoad() {
+    if(typeof window.ethereum !== 'undefined') {
+      try {
+        window.web3 = new Web3(ethereum);
+        await window.ethereum.enable();
+        this.initialize();
+      } catch (error) {
+          console.log(ERROR_UTILS.sanitizeError(error));
+      }
+    } else if(typeof window.web3 !== 'undefined') {
+      this.initialize();
+    }
+  }
+
+  initialize() {
+      this.web3          = window.web3;
+      this.eth           = new Eth(window.web3.currentProvider);
+      window.ethjs      
