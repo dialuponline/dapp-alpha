@@ -10,4 +10,38 @@ import tokenAbi from 'singularitynet-token-contracts/abi/SingularityNetToken.jso
 import agentAbi from 'singularitynet-platform-contracts/abi/Agent.json';
 import {Layout, Divider, Card, Icon, Spin, message, Alert, Row, Col} from 'antd';
 import Account from './components/account';
-imp
+import Services from './components/services';
+import Job from './components/job';
+import { NETWORKS, AGI, SERVICE_SPEC_PROVIDER_URL,ERROR_UTILS } from './util';
+
+import DefaultService from './components/service/default';
+import AlphaExampleService from './components/service/alpha_example';
+import FaceDetectService from './components/service/face_detect';
+import FaceLandmarksService from './components/service/face_landmarks';
+import FaceAlignmentService from './components/service/face_alignment';
+import FaceRecognitionService from './components/service/face_recognition';
+import ExchangeService from './components/service/exchange';
+
+
+class App extends React.Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      account:                    undefined,
+      ethBalance:                 0,
+      agiBalance:                 0,
+      chainId:                    undefined,
+      selectedAgent:              undefined,
+      serviceEncoding:            undefined,
+      serviceSpec:                undefined,
+      agentCallComponent:         undefined,
+      usingDefaultCallComponent:  false,
+    };
+
+    this.serviceNameToComponent = {
+      'Alpha TensorFlow Agent': AlphaExampleService,
+      'face_detect': FaceDetectService,
+      'face_landmarks': FaceLandmarksService,
+      '
