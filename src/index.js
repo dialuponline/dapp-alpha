@@ -90,4 +90,40 @@ class App extends React.Component {
   initialize() {
       this.web3          = window.web3;
       this.eth           = new Eth(window.web3.currentProvider);
-      window.ethjs      
+      window.ethjs       = this.eth;
+      this.agentContract = this.eth.contract(agentAbi);
+
+      this.watchWalletTimer  = setInterval(() => this.watchWallet(), 500);
+      this.watchNetworkTimer = setInterval(() => this.watchNetwork(), 500);
+  }
+
+  watchWallet() {
+    this.eth.accounts().then(accounts => {
+
+      if(accounts.length === 0) {
+        console.log('wallet is locked');
+        this.setState({account: undefined});
+        return;
+      } else if(accounts[0] !== this.state.account) {
+        console.log('account: ' + accounts[0] + ' unlocked');
+        this.setState({ account: accounts[0] });
+      }
+
+      this.eth.getBalance(accounts[0]).then(response => {
+        let balance = Number(response.toString());
+        if(balance !== this.state.ethBalance) {
+          console.log('account eth balance is: ' + Eth.fromWei(balance, 'ether'));
+          this.setState({ethBalance: balance});
+        }
+      })
+
+      if(this.tokenInstance) {
+        this.tokenInstance.balanceOf(this.state.account).then(response => {
+          let balance = Number(response['balance']);
+          if(balance !== this.state.agiBalance) {
+            console.log('account agi balance is: ' + AGI.toDecimal(balance));
+            this.setState({agiBalance: balance})
+          }
+        })
+      } else {
+        this.setState({agiBalance: 0})
