@@ -127,3 +127,35 @@ class App extends React.Component {
         })
       } else {
         this.setState({agiBalance: 0})
+      }
+    }).catch(err => { console.log(err) });
+  }
+
+  watchNetwork() {
+    this.eth.net_version().then(chainId => {
+
+      if (this.state.chainId !== chainId && typeof chainId !== undefined) {
+        if (typeof NETWORKS[chainId] !== "undefined" && typeof NETWORKS[chainId].name !== "undefined") {
+          console.log("connected to network: " + NETWORKS[chainId].name);
+        }
+        this.setState({chainId: chainId});
+
+        this.registryInstances = {};
+        // if (chainId in AlphaRegistryNetworks) { this.registryInstances["AlphaRegistry"] = this.eth.contract(AlphaRegistryAbi).at(AlphaRegistryNetworks[chainId].address) };
+        if (chainId in RegistryNetworks) { this.registryInstances["Registry"] = this.eth.contract(RegistryAbi).at(RegistryNetworks[chainId].address) };
+
+        this.tokenInstance = (chainId in tokenNetworks) ? this.eth.contract(tokenAbi).at(tokenNetworks[chainId].address) : undefined;
+      }
+    }).catch(err => {
+      console.log(err);
+      this.setState({ chainId: undefined });
+    });
+  }
+
+  hireAgent(agent) {
+    console.log("Agent " + agent.name + " selected");
+    Promise.all([
+      window.fetch(`${agent.endpoint}/encoding`),
+      window.fetch(`${SERVICE_SPEC_PROVIDER_URL}/${agent.address}`)
+    ]) 
+      .then(([ encodingResponse, serviceSpecResponse ]) => Prom
