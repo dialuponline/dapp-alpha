@@ -158,4 +158,31 @@ class App extends React.Component {
       window.fetch(`${agent.endpoint}/encoding`),
       window.fetch(`${SERVICE_SPEC_PROVIDER_URL}/${agent.address}`)
     ]) 
-      .then(([ encodingResponse, serviceSpecResponse ]) => Prom
+      .then(([ encodingResponse, serviceSpecResponse ]) => Promise.all([ encodingResponse.text(), serviceSpecResponse.json() ]))
+      .then(([ serviceEncoding, serviceSpec ]) => {
+        this.setState({
+          selectedAgent: agent,
+          serviceSpec,
+          serviceEncoding: serviceEncoding.trim(),
+          serviceCallComponent: this.serviceNameToComponent[agent.name] || this.serviceDefaultComponent,
+          usingDefaultCallComponent: !(agent.name in this.serviceNameToComponent),
+        });
+      })
+      .catch(console.error) 
+  }
+
+
+  render() {
+
+    return (
+      <div>
+        <Layout style={{ minHeight: '100vh' }} >
+          <Layout.Header style={{ background: 'rgb(35, 13, 58)' }}>
+            <img src="/img/logo.svg" alt="SingularityNET" />
+          </Layout.Header>
+          <Layout.Content>
+            <Row type="flex" justify="center" style={{ marginTop: '40px' }}>
+              <Col xs={24} sm={24} md={22} lg={15} xl={18} span={9}>
+                <Account network={this.state.chainId} account={this.state.account} ethBalance={this.state.ethBalance} agiBalance={this.state.agiBalance} />
+                <Divider/>
+                <Services account={this.state.account} network={this.state.chainId} registries={this.registryInstances} agentContract={this.agentContract} onAgentClick={(agent) => this.hireAgent(a
