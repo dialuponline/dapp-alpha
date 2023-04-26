@@ -185,4 +185,26 @@ class App extends React.Component {
               <Col xs={24} sm={24} md={22} lg={15} xl={18} span={9}>
                 <Account network={this.state.chainId} account={this.state.account} ethBalance={this.state.ethBalance} agiBalance={this.state.agiBalance} />
                 <Divider/>
-                <Services account={this.state.account} network={this.state.chainId} registries={this.registryInstances} agentContract={this.agentContract} onAgentClick={(agent) => this.hireAgent(a
+                <Services account={this.state.account} network={this.state.chainId} registries={this.registryInstances} agentContract={this.agentContract} onAgentClick={(agent) => this.hireAgent(agent)} />
+                <Divider/>
+                { this.state.usingDefaultCallComponent &&
+                  <Alert type="warning" message="This service is using the default interface" description="You will have to marshall the data into JSON-RPC yourself and ensure it matches the API of the service based on its documentation."/>
+                }
+                {
+                  this.state.selectedAgent && this.state.serviceEncoding && this.state.serviceSpec && this.state.chainId && this.state.account &&
+                  <Job network={this.state.chainId} account={this.state.account} agent={this.state.selectedAgent} serviceEncoding={this.state.serviceEncoding} serviceSpec={this.state.serviceSpec} setFetchHeaders={this.setFetchHeaders} callComponent={this.state.serviceCallComponent} token={this.tokenInstance} />
+                }
+              </Col>
+            </Row>
+          </Layout.Content>
+          <Layout.Footer style={{ textAlign: 'center' }} >SingularityNET</Layout.Footer>
+        </Layout>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <App/>,
+  document.getElementById('react-root')
+);
