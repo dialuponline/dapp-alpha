@@ -99,3 +99,26 @@ export class ERROR_UTILS {
 
     return ERROR_MESSAGE.unknown + " [" + String(error) + "]"
   }
+
+}
+
+
+
+export const isValidAddress = (address, coin, network) => {
+
+  if (coin === 'bitcoin') {
+    network = network === 'testnet' ? bitcoin.networks.testnet : bitcoin.networks.bitcoin
+    try {
+      bitcoin.address.toOutputScript(address, network)
+      return true
+    } catch (e) {
+      return false
+    }
+  } 
+  
+  //TODO Add other future coins address validation here 
+
+  return false
+}
+
+export function hasOwnDefinedProperty(object, property) { return object.hasOwnProperty(property) && typeof object[property] !== "undefined" }
